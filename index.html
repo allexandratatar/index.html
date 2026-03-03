@@ -171,7 +171,7 @@
 <div class="wrap">
   <header>
     <div style="display:flex;align-items:center">
-      <div class="logo">ConstructPRO</div>
+      <div class="logo" id="hFirmaNume">CONSTRUCTPRO</div>
       <div class="project-id">PROIECT: <span id="hProiectId">IND-2025-047</span> &nbsp;|&nbsp; <span id="hProiectNume">Depou Logistică Industrială</span></div>
     </div>
     <div class="header-right">
@@ -287,6 +287,7 @@
       <div class="edit-section active" id="esec-general">
         <div class="edit-section-title">informații proiect</div>
         <div class="edit-grid">
+          <div class="field"><label>Numele Firmei</label><input type="text" id="f-firmaNume" placeholder="ex: CONSTRUCTPRO"></div>
           <div class="field"><label>Cod Proiect</label><input type="text" id="f-proiectId"></div>
           <div class="field"><label>Denumire Proiect</label><input type="text" id="f-proiectNume"></div>
         </div>
@@ -347,51 +348,64 @@
 // DATA (stocat intern în RON, afișat în moneda selectată)
 // ══════════════════════════════════════════════
 let DATA = {
+  firmaNume: 'CONSTRUCTPRO',          // ← Numele firmei (editabil)
   proiectId: 'IND-2025-047',
-  proiectNume: 'Depou Logistică Industrială',
+  proiectNume: 'Clădire rezidențială',
   cursEUR: 4.97,        // 1 EUR = 4.97 RON
   currency: 'EUR',      // moneda curentă afișată
-  bugetTotal: 8240000,  // RON
-  angajat:    6184200,
-  realizatTotal: 4614000,
-  progrFiz: 87, cpi: 0.97, spi: 1.02,
-  riscTotal: 7, riscCritice: 2, riscMedii: 3,
+  // Valori în RON (afișate în EUR la cursul de mai sus)
+  // Buget total: 7.678.048 EUR × 4.97 = 38.159.898 RON
+  bugetTotal: 38159898,
+  // Costuri angajate: 7.013.921 EUR × 4.97 = 34.879.197 RON
+  angajat:    34879197,
+  // Costuri realizate: 4.735.212 EUR × 4.97 = 23.533.903 RON
+  realizatTotal: 23533903,
+  progrFiz: 62, cpi: 1.00, spi: 0.99,
+  riscTotal: 2, riscCritice: 1, riscMedii: 1,
   categories: [
-    { name:'Terasamente & Fundații',    buget:1022000, realizat:1058400, angajat:1022000, color:'#ff6b1a' },
-    { name:'Structură Beton Armat',     buget:1853000, realizat:1920000, angajat:1853000, color:'#2E75B6' },
-    { name:'Zidărie & Compartimentări', buget:412000,  realizat:298000,  angajat:380000,  color:'#00c8e0' },
-    { name:'Acoperiș & Hidroizolații',  buget:342000,  realizat:261000,  angajat:320000,  color:'#7c3aed' },
-    { name:'Instalații Sanitare',       buget:318000,  realizat:210000,  angajat:298000,  color:'#0891b2' },
-    { name:'Instalații Electrice',      buget:495000,  realizat:225000,  angajat:380000,  color:'#ffc840' },
-    { name:'HVAC',                      buget:752000,  realizat:345000,  angajat:620000,  color:'#00e57a' },
-    { name:'Finisaje Interioare',       buget:840000,  realizat:162000,  angajat:420000,  color:'#f59e0b' },
-    { name:'Amenajări Exterioare',      buget:310000,  realizat:0,       angajat:0,       color:'#64748b' },
-    { name:'Dotări & Echipamente',      buget:896000,  realizat:135000,  angajat:581000,  color:'#ec4899' },
-    { name:'Rezervă Risc',             buget:1000000, realizat:0,       angajat:310200,  color:'#4a5a70' },
+    // Buget EUR × 4.97 = RON | Realizat EUR × 4.97 | Angajat EUR × 4.97
+    { name:'Terasamente & Fundații',    buget:4003500,  realizat:4003500,  angajat:4509185,  color:'#ff6b1a' },
+    { name:'Structură Beton Armat',     buget:6821989,  realizat:6821989,  angajat:9705558,  color:'#2E75B6' },
+    { name:'Zidărie & Compartimentări', buget:3393958,  realizat:3393958,  angajat:2864933,  color:'#00c8e0' },
+    { name:'Acoperiș & Hidroizolații',  buget:3324001,  realizat:3324001,  angajat:3452678,  color:'#7c3aed' },
+    { name:'Instalații Sanitare',       buget:3301000,  realizat:2385600,  angajat:3522759,  color:'#0891b2' },
+    { name:'Instalații Electrice',      buget:3477695,  realizat:1964879,  angajat:3014582,  color:'#ffc840' },
+    { name:'HVAC',                      buget:3237001,  realizat:1242500,  angajat:2956378,  color:'#00e57a' },
+    { name:'Finisaje Interioare',       buget:4420100,  realizat:261349,   angajat:3411479,  color:'#f59e0b' },
+    { name:'Amenajări Exterioare',      buget:3292999,  realizat:0,        angajat:0,        color:'#64748b' },
+    { name:'Dotări & Echipamente',      buget:895800,   realizat:135000,   angajat:926300,   color:'#ec4899' },
+    { name:'Rezervă Risc',             buget:1001297,  realizat:0,        angajat:0,        color:'#4a5a70' },
+    { name:'Tâmplărie de aluminiu',    buget:1093558,  realizat:0,        angajat:844900,   color:'#94a3b8' },
   ],
   monthly: [
-    { month:'Ian 25', plan:280000, real:265000 },{ month:'Feb 25', plan:310000, real:298000 },
-    { month:'Mar 25', plan:385000, real:412000 },{ month:'Apr 25', plan:420000, real:398000 },
-    { month:'Mai 25', plan:510000, real:487000 },{ month:'Iun 25', plan:560000, real:542000 },
-    { month:'Iul 25', plan:480000, real:501000 },{ month:'Aug 25', plan:390000, real:375000 },
-    { month:'Sep 25', plan:420000, real:445000 },{ month:'Oct 25', plan:350000, real:328000 },
-    { month:'Nov 25', plan:295000, real:310000 },{ month:'Dec 25', plan:280000, real:153000 },
+    { month:'Ian 25', plan:1889860, real:1799140 },
+    { month:'Feb 25', plan:2087940, real:2030660 },
+    { month:'Mar 25', plan:2531850, real:2607080 },
+    { month:'Apr 25', plan:2887060, real:2819260 },
+    { month:'Mai 25', plan:3082780, real:2971860 },
+    { month:'Iun 25', plan:2887060, real:3041640 },
+    { month:'Iul 25', plan:2691340, real:2629540 },
+    { month:'Aug 25', plan:2390590, real:2441870 },
+    { month:'Sep 25', plan:2238609, real:2298430 },
+    { month:'Oct 25', plan:1939810, real:1879980 },
+    { month:'Nov 25', plan:1589520, real:1069340 },
+    { month:'Dec 25', plan:1339886, real:0 },
   ],
   risks: [
-    { id:'R01', name:'Creștere prețuri HVAC',          prob:4, impact:4, owner:'PM' },
-    { id:'R02', name:'Întârziere livrare echipamente',  prob:4, impact:4, owner:'Achizitii' },
+    { id:'R01', name:'',                                prob:0, impact:0, owner:'' },
+    { id:'R02', name:'Întârziere livrare echipamente',  prob:3, impact:4, owner:'Achizitii' },
     { id:'R03', name:'Condiții meteo nefavorabile',     prob:3, impact:3, owner:'RTE' },
-    { id:'R04', name:'Modificări proiect tehnic',       prob:3, impact:3, owner:'PM' },
-    { id:'R05', name:'Depășire buget finisaje',         prob:3, impact:2, owner:'PM' },
-    { id:'R06', name:'Resurse umane insuficiente',      prob:2, impact:3, owner:'HR' },
-    { id:'R07', name:'Probleme geotehnice noi',         prob:1, impact:3, owner:'RTE' },
+    { id:'R04', name:'Modificări proiect tehnic',       prob:2, impact:3, owner:'PM' },
+    { id:'R05', name:'',                                prob:0, impact:0, owner:'' },
+    { id:'R06', name:'',                                prob:0, impact:0, owner:'' },
+    { id:'R07', name:'',                                prob:0, impact:0, owner:'' },
   ],
   alerts: [
-    { type:'critical', icon:'🔴', title:'HVAC — Depășire +11.3%',       desc:'Costuri depășesc bugetul cu 7.041 €.' },
-    { type:'critical', icon:'🔴', title:'Finisaje — Progres 15%',        desc:'3 săptămâni în urmă față de plan.' },
-    { type:'warning',  icon:'🟡', title:'Structură BA — Depășire 3.6%',  desc:'386.319 € vs. 372.838 € buget.' },
-    { type:'warning',  icon:'🟡', title:'CPI sub 1.00',                   desc:'CPI=0.97 — risc depășire globală.' },
-    { type:'info',     icon:'🔵', title:'Acoperiș — finalizare estimată', desc:'85% progres. Estimare: 15.03.2026.' },
+    { type:'critical', icon:'🔴', title:'Întârziere livrare echipamente', desc:'Risc activ — impact asupra graficului.' },
+    { type:'critical', icon:'🔴', title:'Finisaje — Progres 6%',          desc:'3 săptămâni în urmă față de plan.' },
+    { type:'warning',  icon:'🟡', title:'HVAC — Progres 38%',             desc:'Întârziere semnificativă față de plan.' },
+    { type:'warning',  icon:'🟡', title:'Dotări & Echipamente — 15%',     desc:'Ritm lent de execuție.' },
+    { type:'info',     icon:'🔵', title:'Acoperiș — finalizare estimată', desc:'100% progres. Finalizat 15.03.2026.' },
   ],
 };
 
@@ -484,6 +498,7 @@ function switchTab(id) {
 function renderAll() {
   document.getElementById('hProiectId').textContent = DATA.proiectId;
   document.getElementById('hProiectNume').textContent = DATA.proiectNume;
+  document.getElementById('hFirmaNume').textContent = DATA.firmaNume || 'CONSTRUCTPRO';
   renderKPIs(); renderDonut(); renderWaterfall(); renderAlerts();
   renderQuickStatus(); renderBudgetTable(); renderRisks(); renderStatusTable();
   setTimeout(drawCharts, 50);
@@ -786,6 +801,7 @@ function populateEditForm() {
   const sym = SYM();
   const conv = v => isEUR ? Math.round(v/DATA.cursEUR) : v;
 
+  document.getElementById('f-firmaNume').value = DATA.firmaNume || 'CONSTRUCTPRO';
   document.getElementById('f-proiectId').value = DATA.proiectId;
   document.getElementById('f-proiectNume').value = DATA.proiectNume;
   document.getElementById('f-curs').value = DATA.cursEUR;
@@ -932,6 +948,7 @@ function applyEdit() {
   const toRON = v => isEUR ? Math.round(v * DATA.cursEUR) : v;
 
   // General
+  DATA.firmaNume = document.getElementById('f-firmaNume').value.trim() || 'CONSTRUCTPRO';
   DATA.proiectId = document.getElementById('f-proiectId').value;
   DATA.proiectNume = document.getElementById('f-proiectNume').value;
   DATA.cursEUR = +document.getElementById('f-curs').value || DATA.cursEUR;
