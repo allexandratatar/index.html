@@ -396,6 +396,28 @@ let DATA = {
 };
 
 // ══════════════════════════════════════════════
+// LOCAL STORAGE — salvare & încărcare automată
+// ══════════════════════════════════════════════
+const LS_KEY = 'constructpro_data';
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(DATA));
+  } catch(e) { console.warn('Nu s-a putut salva:', e); }
+}
+
+function loadFromStorage() {
+  try {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Merge deep — păstrează structura originală, suprascrie cu datele salvate
+      Object.assign(DATA, parsed);
+    }
+  } catch(e) { console.warn('Nu s-a putut încărca:', e); }
+}
+
+// ══════════════════════════════════════════════
 // CURRENCY HELPERS
 // ══════════════════════════════════════════════
 // All internal values are RON. Convert to display currency on the fly.
@@ -959,7 +981,8 @@ function applyEdit() {
 
   toggleEdit();
   renderAll();
-  showToast('✓ Date actualizate!');
+  saveToStorage();
+  showToast('✓ Date salvate automat!');
 }
 
 function resetEdit() { populateEditForm(); }
@@ -973,11 +996,52 @@ function updateDate() {
   document.getElementById('headerDate').textContent = new Date().toLocaleString('ro-RO',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','');
 }
 
+function exportData() {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `constructpro_${DATA.proiectId}_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('✓ Date exportate!');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        Object.assign(DATA, parsed);
+        saveToStorage();
+        renderAll();
+        showToast('✓ Date importate cu succes!');
+      } catch(err) { showToast('⚠ Fișier invalid!'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  loadFromStorage();
   updateDate(); setInterval(updateDate,30000);
   renderAll();
   window.addEventListener('resize', drawCharts);
   document.getElementById('editOverlay').addEventListener('click', e=>{ if(e.target===e.currentTarget)toggleEdit(); });
+
+  // Butoane Export / Import în header
+  const headerRight = document.querySelector('.header-right');
+  const storageButtons = document.createElement('div');
+  storageButtons.style.cssText = 'display:flex;gap:0.5rem;align-items:center;';
+  storageButtons.innerHTML = `
+    <button onclick="exportData()" style="padding:0.4rem 0.75rem;background:rgba(0,200,224,0.1);border:1px solid rgba(0,200,224,0.3);border-radius:2px;color:#00c8e0;font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;" title="Descarcă datele ca fișier JSON">⬇ Export</button>
+    <button onclick="importData()" style="padding:0.4rem 0.75rem;background:rgba(0,229,122,0.1);border:1px solid rgba(0,229,122,0.3);border-radius:2px;color:#00e57a;font-family:'Barlow Condensed',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;" title="Încarcă date dintr-un fișier JSON">⬆ Import</button>
+  `;
+  headerRight.insertBefore(storageButtons, headerRight.firstChild);
 });
 </script>
 </body>
